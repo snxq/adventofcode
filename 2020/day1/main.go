@@ -14,9 +14,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var sum int = 2020
+
+	fmt.Println("part1 result: ", part1(data, sum))
+	fmt.Println("part2 result: ", part2(data, sum))
+}
+
+// part1 x+y=2020 x*y=?
+func part1(data []int, sum int) int {
 	result := 1
 	for i, x := range data {
-		y := 2020 - x
+		y := sum - x
 		var exist bool
 		for _, z := range data[i:] {
 			if z == y {
@@ -29,11 +37,26 @@ func main() {
 		}
 	}
 
-	fmt.Println(result)
+	return result
+}
+
+// part2 x+y+z=2020 x*y*z=?
+func part2(data []int, sum int) int {
+	result := 1
+	for _, x := range data {
+		y := sum - x
+		p := part1(data, y)
+		if p != 1 {
+			result = result * x * p
+			break
+		}
+	}
+
+	return result
 }
 
 func readData() ([]int, error) {
-	b, err := ioutil.ReadFile("2020/day1/part1/data")
+	b, err := ioutil.ReadFile("2020/day1/data")
 	if err != nil {
 		return nil, err
 	}
