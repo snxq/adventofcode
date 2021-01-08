@@ -12,8 +12,8 @@ import (
 func main() {
 	c := make(chan *line)
 	var (
-		result int
-		end    bool
+		result1, result2 int
+		end              bool
 	)
 	go readData(c)
 	for {
@@ -23,6 +23,7 @@ func main() {
 				end = true
 				break
 			}
+			// part 1
 			var times int
 			for _, c := range l.password {
 				if string(c) == l.key {
@@ -30,7 +31,13 @@ func main() {
 				}
 			}
 			if times >= l.minTimes && times <= l.maxTimes {
-				result++
+				result1++
+			}
+			// part 2
+			if !((string(l.password[l.maxTimes-1]) == l.key) ==
+				(string(l.password[l.minTimes-1]) == l.key)) {
+
+				result2++
 			}
 		default:
 			//
@@ -39,7 +46,8 @@ func main() {
 			break
 		}
 	}
-	fmt.Println(result)
+	fmt.Println(result1)
+	fmt.Println(result2)
 }
 
 // Password every line
