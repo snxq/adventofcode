@@ -10,11 +10,20 @@ func main() {
 	c := make(chan string)
 	go readData(c)
 
-	var (
-		end          bool
-		x            int
-		square, tree int
-	)
+	var end bool
+
+	slopes := []*slope{{
+		right: 1, down: 1,
+	}, {
+		right: 3, down: 1,
+	}, {
+		right: 5, down: 1,
+	}, {
+		right: 7, down: 1,
+	}, {
+		right: 1, down: 2,
+	}}
+
 	for {
 		select {
 		case line := <-c:
@@ -22,24 +31,55 @@ func main() {
 				end = true
 				break
 			}
-			if x == 0 {
-				x = x + 3
-				continue
+			for _, slope := range slopes {
+				slope.slip(line)
 			}
-			if line[x%len(line)] == '#' {
-				tree++
-			} else {
-				square++
-			}
-			x = x + 3
 		default:
 			//
 		}
 		if end {
+			close(c)
 			break
 		}
 	}
-	fmt.Printf("Square: %d, Tree: %d\n", square, tree)
+
+	var result int = 1
+	for _, slope := range slopes {
+		// part1
+		fmt.Printf("Right: %d, Down: %d, Square: %d, Tree: %d, X: %d, Y: %d\n",
+			slope.right, slope.down, slope.square, slope.tree, slope.x, slope.y)
+		// part2
+		result = result * slope.tree
+	}
+	fmt.Printf("Part2 result: %d\n", result)
+}
+
+// different slopes
+type slope struct {
+	x, y         int
+	right, down  int
+	square, tree int
+}
+
+func (s *slope) slip(line string) {
+	defer func() {
+		s.x = s.x + s.right
+		s.y++
+	}()
+
+	if s.x == 0 {
+		return
+	}
+	if (s.y % s.down) != 0 {
+		s.x = s.x - s.right
+		return
+	}
+	if line[s.x%len(line)] == '#' {
+		s.tree++
+	} else {
+		s.square++
+	}
+	return
 }
 
 func readData(c chan string) {
